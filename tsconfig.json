@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es5",
+		"target": "es6",
 		"module": "commonjs",
 
 		"strict": true,
@@ -17,6 +17,7 @@
 		"typeRoots": [
 			"src/cordovaTypings",
 			"node_modules/@types"
-		]
+		],
+		"resolveJsonModule": true
 	}
 }
