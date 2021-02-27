@@ -18,6 +18,7 @@ devDependencies:
   mock-stdin: 1.0.0
   nyc: 15.1.0
   rewire: 5.0.0
+  typescript: 4.2.2
 lockfileVersion: 5.2
 packages:
   /@babel/code-frame/7.12.13:
@@ -4543,6 +4544,13 @@ packages:
       is-typedarray: 1.0.0
     resolution:
       integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
+  /typescript/4.2.2:
+    dev: true
+    engines:
+      node: '>=4.2.0'
+    hasBin: true
+    resolution:
+      integrity: sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
   /underscore/1.12.0:
     dev: false
     resolution:
@@ -4830,4 +4838,5 @@ specifiers:
   rewire: ^5.0.0
   semver: ^7.3.2
   systeminformation: ^5.5.0
+  typescript: ^4.2.2
   update-notifier: ^4.1.0
