@@ -16,33 +16,31 @@
     specific language governing permissions and limitations
     under the License.
 */
-var fs = require('fs');
-var cordova_lib = require('cordova-lib');
-var path = require('path');
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
+import { binname } from 'cordova_lib';
 
-module.exports = function help (args) {
-    var command,
-        file,
-        raw,
-        docdir;
-    args = args || [];
-    command = ((args)[0] || 'cordova');
-    docdir = path.join(__dirname, '..', 'doc');
-    file = [
-        command + '.md',
-        command + '.txt',
+/**
+ * help finds a help file for something and returns its contents.
+ *
+ * @param arg The name of the help topic to display. The files checked for help
+ * text are, in order, `{arg}.md`, `{arg}.txt`, `cordova.md`, and `cordova.txt`
+ * in `../doc/` (relative to the process CWD).
+ * @returns The contents of the chosen help file, if any are found.
+ * @throws {Error} If no help file can be found.
+ */
+export function help (arg: string = 'cordova'): string {
+    const docdir = join(__dirname, '..', 'doc');
+    const file = [
+        arg + '.md',
+        arg + '.txt',
         'cordova.md',
         'cordova.txt'
-    ].map(function (file) {
-        var f = path.join(docdir, file);
-        if (fs.existsSync(f)) {
+	].map((file_name) => {
+        const f = join(docdir, file_name);
+        if (existsSync(f)) {
             return f;
         }
-    }).filter(function (f) {
-        return !!f;
-    });
-    raw = fs.readFileSync(file[0]).toString('utf8').replace(/cordova-cli/g, cordova_lib.binname);
-    // cordova.emit('results', raw);
-
-    return raw;
+	}).filter((f) => f);
+    return readFileSync(file[0], "utf8").replace(/cordova-cli/g, binname);
 };
