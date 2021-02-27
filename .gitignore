@@ -12,6 +12,10 @@ lib/cordova-android/framework/local.properties
 lib/cordova-wp7/example
 lib/cordova-wp8/example
 .idea/*
+.vscode/
+*.code-workspace
+*.sublime-*
+.vim/
 spec/fixtures/*
 .gitcore
 *.jar
