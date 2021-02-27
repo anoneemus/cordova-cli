@@ -19,61 +19,72 @@
 // https://github.com/cordova/cordova-discuss/pull/43
 
 // Google Analytics tracking code
-var GA_TRACKING_CODE = 'UA-64283057-7';
+const GA_TRACKING_CODE = 'UA-64283057-7';
 
-var pkg = require('../package.json');
-var Insight = require('insight');
+import { EOL } from "os";
+import Insight from 'insight';
+import pkg from '../package.json';
 
 /**
  * By redefining `get optOut` we trick Insight into tracking
  * even though the user might have opted out.
+ *
+ * @todo The discussion on #43 specifically mentions that users should be able
+ * to opt out - so why not allow them?
  */
 class RelentlessInsight extends Insight {
-    get optOut () { return false; }
+    public _permissionTimeout = 30;
+    // This class is unexported and `getOpt` is never accessed, so I don't
+    // think this actually did anything.
+    // get optOut () { return false; }
+    // set optOut (value) { super.optOut = value; }
 
-    set optOut (value) { super.optOut = value; }
-
-    get realOptOut () { return super.optOut; }
+    // get realOptOut () { return super.optOut; }
 }
 
-var insight = new RelentlessInsight({
+const insight = new RelentlessInsight({
     trackingCode: GA_TRACKING_CODE,
     pkg: pkg
 });
 
+export let timeoutInSecs = 30;
+
 /**
- * Returns true if the user opted in, and false otherwise
+ * Prompts the user to allow telemetry, and returns their response.
+ *
+ * @returns `true` if the user opted in, and `false` otherwise.
  */
-function showPrompt () {
-    return new Promise(function (resolve, reject) {
-        var msg = 'May Cordova anonymously report usage statistics to improve the tool over time?';
-        insight._permissionTimeout = module.exports.timeoutInSecs || 30;
-        insight.askPermission(msg, function (unused, optIn) {
-            var EOL = require('os').EOL;
+export async function showPrompt (): Promise<boolean> {
+    return new Promise(resolve => {
+        const msg = 'May Cordova anonymously report usage statistics to improve the tool over time?';
+        insight._permissionTimeout = timeoutInSecs || 30;
+        insight.askPermission(msg, (_: unknown, optIn: boolean) => {
             if (optIn) {
                 console.log(EOL + 'Thanks for opting into telemetry to help us improve cordova.');
-                module.exports.track('telemetry', 'on', 'via-cli-prompt-choice', 'successful');
+                track('telemetry', 'on', 'via-cli-prompt-choice', 'successful');
             } else {
                 console.log(EOL + 'You have been opted out of telemetry. To change this, run: cordova telemetry on.');
                 // Always track telemetry opt-outs! (whether opted-in or opted-out)
-                module.exports.track('telemetry', 'off', 'via-cli-prompt-choice', 'successful');
+                track('telemetry', 'off', 'via-cli-prompt-choice', 'successful');
             }
             resolve(optIn);
         });
     });
 }
 
-function track (...args) {
+export function track (...args: Array<string>): void {
     // Remove empty, null or undefined strings from arguments
     const filteredArgs = args.filter(val => val && val.length !== 0);
     insight.track(...filteredArgs);
 }
 
-function turnOn () {
+/** Turns on telemetry. */
+export function turnOn (): void {
     insight.optOut = false;
 }
 
-function turnOff () {
+/** Turns off telemetry. */
+export function turnOff () {
     insight.optOut = true;
 }
 
@@ -82,46 +93,35 @@ function turnOff () {
  * Has the same effect as if user never answered the telemetry prompt
  * Useful for testing purposes
  */
-function clear () {
-    insight.optOut = undefined;
+export function clear (): void {
+    // optOut is modeled as a boolean, but can apparently be undefined.
+    insight.optOut = undefined as unknown as boolean;
 }
 
-function isOptedIn () {
-    return !insight.realOptOut;
+/**
+ * Returns whether or not the user has opted into telemetry.
+ */
+export function isOptedIn (): boolean {
+    return !insight.optOut;
 }
 
 /**
  * Has the user already answered the telemetry prompt? (thereby opting in or out?)
  */
-function hasUserOptedInOrOut () {
-    var insightOptOut = insight.realOptOut === undefined;
-    return !(insightOptOut);
+export function hasUserOptedInOrOut (): boolean {
+    return insight.optOut !== undefined;
 }
 
 /**
  * Is the environment variable 'CI' specified ?
  */
-function isCI (env) {
-    return !!env.CI;
+export function isCI (env: Record<string, unknown>): env is Record<string, unknown> & Record<"CI", unknown> {
+    return "CI" in env;
 }
 
 /**
  * Has the user ran a command of the form: `cordova run --no-telemetry` ?
  */
-function isNoTelemetryFlag (args) {
+export function isNoTelemetryFlag (args: Array<string>): boolean {
     return args.indexOf('--no-telemetry') > -1;
 }
-
-// this is to help testing, so we don't have to wait for the full 30
-module.exports = {
-    track: track,
-    turnOn: turnOn,
-    turnOff: turnOff,
-    clear: clear,
-    isOptedIn: isOptedIn,
-    hasUserOptedInOrOut: hasUserOptedInOrOut,
-    isCI: isCI,
-    showPrompt: showPrompt,
-    isNoTelemetryFlag: isNoTelemetryFlag,
-    timeoutInSecs: 30
-};
