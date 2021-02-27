@@ -18,7 +18,8 @@
 */
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { binname } from 'cordova_lib';
+
+import { binname } from 'cordova-lib';
 
 /**
  * help finds a help file for something and returns its contents.
@@ -36,11 +37,9 @@ export function help (arg: string = 'cordova'): string {
         arg + '.txt',
         'cordova.md',
         'cordova.txt'
-	].map((file_name) => {
-        const f = join(docdir, file_name);
-        if (existsSync(f)) {
-            return f;
-        }
-	}).filter((f) => f);
+	].map(file_name => join(docdir, file_name)).filter(f=>existsSync(f));
+    if (!file[0]) {
+        throw new Error(`no help files found for '${arg}'`);
+    }
     return readFileSync(file[0], "utf8").replace(/cordova-cli/g, binname);
 };
