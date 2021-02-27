@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@cordova/eslint-config": "^3.0.0",
+    "@types/insight": "^0.8.0",
     "jasmine": "^3.5.0",
     "mock-stdin": "^1.0.0",
     "nyc": "^15.1.0",
