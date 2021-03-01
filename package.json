@@ -41,6 +41,7 @@
     "@cordova/eslint-config": "^3.0.0",
     "@types/insight": "^0.8.0",
     "@types/nopt": "^3.0.29",
+    "@types/semver": "^7.3.4",
     "@types/update-notifier": "^5.0.0",
     "jasmine": "^3.5.0",
     "mock-stdin": "^1.0.0",
