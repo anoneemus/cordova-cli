@@ -43,6 +43,8 @@
     "@types/nopt": "^3.0.29",
     "@types/semver": "^7.3.4",
     "@types/update-notifier": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.16.0",
+    "@typescript-eslint/parser": "^4.16.0",
     "jasmine": "^3.5.0",
     "mock-stdin": "^1.0.0",
     "nyc": "^15.1.0",
