@@ -29,7 +29,7 @@ const cordova_create_1 = __importDefault(require("cordova-create"));
 const cordova_lib_1 = require("cordova-lib");
 const package_json_1 = require("cordova-lib/package.json");
 const package_json_2 = __importDefault(require("../package.json"));
-const help_1 = require("./help");
+const help_1 = __importDefault(require("./help"));
 const info_1 = require("./info");
 const telemetry_1 = require("./telemetry");
 const logger = cordova_common_1.CordovaLogger.get();
@@ -219,7 +219,7 @@ function getSubCommand(args, cmd) {
     return null;
 }
 function printHelp(command) {
-    cordova_lib_1.cordova.emit('results', help_1.help(command));
+    cordova_lib_1.cordova.emit('results', help_1.default(command));
 }
 function handleTelemetryCmd(subcommand, isOptedIn) {
     if (subcommand !== 'on' && subcommand !== 'off') {

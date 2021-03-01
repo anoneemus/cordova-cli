@@ -30,7 +30,7 @@ import { binname } from 'cordova-lib';
  * @returns The contents of the chosen help file, if any are found.
  * @throws {Error} If no help file can be found.
  */
-export function help (arg: string = 'cordova'): string {
+function help (arg: string = 'cordova'): string {
     const docdir = join(__dirname, '..', 'doc');
     const file = [
         arg + '.md',
@@ -43,3 +43,5 @@ export function help (arg: string = 'cordova'): string {
     }
     return readFileSync(file[0], 'utf8').replace(/cordova-cli/g, binname);
 }
+
+export = help;

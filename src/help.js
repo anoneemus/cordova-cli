@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.help = void 0;
 /**
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -44,4 +42,4 @@ function help(arg = 'cordova') {
     }
     return fs_1.readFileSync(file[0], 'utf8').replace(/cordova-cli/g, cordova_lib_1.binname);
 }
-exports.help = help;
+module.exports = help;

@@ -28,7 +28,7 @@ import { version as libVersion } from 'cordova-lib/package.json';
 
 import pkg from '../package.json';
 
-import { help } from './help';
+import help from './help';
 import { info } from './info';
 import {
     hasUserOptedInOrOut,
