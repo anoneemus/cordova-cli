@@ -15,29 +15,39 @@
     under the License.
 */
 
-const path = require('path');
-const fs = require('fs-extra');
-const execa = require('execa');
-const { osInfo } = require('systeminformation');
-const { cordova, cordova_platforms: { getPlatformApi } } = require('cordova-lib');
+import { exec } from 'child_process';
+import { existsSync, readFileSync } from 'fs';
+import type { PathLike } from 'fs';
+import { join } from 'path';
+import { osInfo } from 'systeminformation';
+import { cordova, cordova_platforms } from 'cordova-lib';
+import { getInstalledPlatformsWithVersions } from "cordova-lib/src/cordova/util";
+import { getInstalledPlugins as cdvGetInstalledPlugins } from "cordova-lib/src/cordova/plugin/util";
+
+const getPlatformApi = cordova_platforms.getPlatformApi;
+
+import cliPkg from "../package.json";
+import libPkg from "cordova-lib/package.json";
 
 const cdvLibUtil = require('cordova-lib/src/cordova/util');
-const cdvPluginUtil = require('cordova-lib/src/cordova/plugin/util');
 
 // Cache
-let _installedPlatformsList = null;
+let _installedPlatformsList: Record<string, string> | null = null;
 
 /*
  * Sections
  */
 
-async function getCordovaDependenciesInfo () {
+async function getCordovaDependenciesInfo (): Promise<DependencyInfo> {
     // get self "Cordova CLI"
-    const cliPkg = require('../package');
     const cliDependencies = await _getLibDependenciesInfo(cliPkg.dependencies);
 
-    const libPkg = require('cordova-lib/package');
     const cliLibDep = cliDependencies.find(({ key }) => key === 'lib');
+    // the old code would've thrown a TypeError on `children` property access,
+    // so I feel pretty good about adding this manual `throw`.
+    if (!cliLibDep) {
+        throw new Error("found no dependency on 'cordova-lib' in CLI package definition");
+    }
     cliLibDep.children = await _getLibDependenciesInfo(libPkg.dependencies);
 
     return {
@@ -50,7 +60,7 @@ async function getCordovaDependenciesInfo () {
     };
 }
 
-async function getInstalledPlatforms (projectRoot) {
+async function getInstalledPlatforms (projectRoot: string): Promise<DependencyInfo> {
     return _getInstalledPlatforms(projectRoot).then(platforms => {
         const key = 'Project Installed Platforms';
         const children = Object.entries(platforms)
@@ -60,15 +70,29 @@ async function getInstalledPlatforms (projectRoot) {
     });
 }
 
-async function getInstalledPlugins (projectRoot) {
+interface PluginInfo {
+    key: string;
+    children: Array<{
+        key: string | undefined;
+        value: string | undefined;
+    }>;
+}
+async function getInstalledPlugins (projectRoot: string): Promise<PluginInfo> {
     const key = 'Project Installed Plugins';
-    const children = cdvPluginUtil.getInstalledPlugins(projectRoot)
+    const children = cdvGetInstalledPlugins(projectRoot)
         .map(plugin => ({ key: plugin.id, value: plugin.version }));
 
     return { key, children };
 }
 
-async function getEnvironmentInfo () {
+interface EnvironmentInfo {
+    key: 'Environment',
+    children: Array<{
+        key: string;
+        value: string;
+    }>;
+}
+async function getEnvironmentInfo (): Promise<EnvironmentInfo> {
     const [npmVersion, osInfoResult] = await Promise.all([_getNpmVersion(), osInfo()]);
     const { platform, distro, release, codename, kernel, arch, build } = osInfoResult;
 
@@ -91,31 +115,38 @@ async function getEnvironmentInfo () {
     };
 }
 
-async function getPlatformEnvironmentData (projectRoot) {
+async function getPlatformEnvironmentData (projectRoot: string): Promise<Array<Promise<NodeList>>> {
     const installedPlatforms = await _getInstalledPlatforms(projectRoot);
 
     return Object.keys(installedPlatforms)
         .map(platform => {
             const platformApi = getPlatformApi(platform);
 
-            const getPlatformInfo = platformApi && platformApi.getEnvironmentInfo
-                ? () => platformApi.getEnvironmentInfo()
-                : _legacyPlatformInfo[platform];
+            let getPlatformInfo;
+            if (platformApi && platformApi.getEnvironmentInfo) {
+                getPlatformInfo = platformApi.getEnvironmentInfo();
+            } else if (platform === "ios") {
+                getPlatformInfo = _legacyPlatformInfo.ios;
+            } else if (platform === "android") {
+                getPlatformInfo = _legacyPlatformInfo.android;
+            } else {
+                getPlatformInfo = false;
+            }
 
             return { platform, getPlatformInfo };
         })
         .filter(o => o.getPlatformInfo)
         .map(async ({ platform, getPlatformInfo }) => ({
             key: `${platform} Environment`,
-            children: await getPlatformInfo()
+            children: await (getPlatformInfo as ()=>Promise<{key: string, value: string}[]>)()
         }));
 }
 
-async function getProjectSettingsFiles (projectRoot) {
+async function getProjectSettingsFiles (projectRoot: string) {
     const cfgXml = _fetchFileContents(cdvLibUtil.projectConfig(projectRoot));
 
     // Create package.json snippet
-    const pkgJson = require(path.join(projectRoot, 'package'));
+    const pkgJson = require(join(projectRoot, 'package'));
     const pkgSnippet = [
         '--- Start of Cordova JSON Snippet ---',
         JSON.stringify(pkgJson.cordova, null, 2),
@@ -135,30 +166,48 @@ async function getProjectSettingsFiles (projectRoot) {
  * Section Data Helpers
  */
 
-async function _getLibDependenciesInfo (dependencies) {
+interface DependencyInfo {
+    children?: Array<DependencyInfo>;
+    key: string | undefined;
+    value?: string;
+}
+async function _getLibDependenciesInfo (dependencies: Record<string, string>): Promise<Array<DependencyInfo>> {
     const cordovaPrefix = 'cordova-';
-    const versionFor = name => require(`${name}/package`).version;
 
     return Object.keys(dependencies)
         .filter(name => name.startsWith(cordovaPrefix))
-        .map(name => ({ key: name.slice(cordovaPrefix.length), value: versionFor(name) }));
+        // programmatic `require`s can't be written as `import`s. The only
+        // other way to do this is with a `readFile` call, which would be a
+        // hassle compared to the automatic resolution provided by `require`.
+        .map(name => ({ key: name.slice(cordovaPrefix.length), value: require(`${name}/package`).version }));
 }
 
-async function _getInstalledPlatforms (projectRoot) {
+async function _getInstalledPlatforms (projectRoot: string): Promise<Record<string, string>> {
     if (!_installedPlatformsList) {
-        _installedPlatformsList = await cdvLibUtil.getInstalledPlatformsWithVersions(projectRoot);
+        _installedPlatformsList = await getInstalledPlatformsWithVersions(projectRoot);
     }
     return _installedPlatformsList;
 }
 
-async function _getNpmVersion () {
-    return (await execa('npm', ['-v'])).stdout;
+async function _getNpmVersion (): Promise<string> {
+    return new Promise((resolve, reject) => {
+        exec('npm -v', (err, stdout, stderr) => {
+            if (stderr !== "") {
+                console.error("'npm -v' stderr:", stderr);
+            }
+            if (err) {
+                reject(err);
+            } else {
+                resolve(stdout);
+            }
+        });
+    });
 }
 
-function _fetchFileContents (filePath) {
-    if (!fs.existsSync(filePath)) return 'File Not Found';
+function _fetchFileContents (filePath: PathLike): string {
+    if (!existsSync(filePath)) return 'File Not Found';
 
-    return fs.readFileSync(filePath, 'utf-8');
+    return readFileSync(filePath, 'utf-8');
 }
 
 /**
@@ -167,27 +216,40 @@ function _fetchFileContents (filePath) {
 const _legacyPlatformInfo = {
     ios: async () => [{
         key: 'xcodebuild',
-        value: await _failSafeSpawn('xcodebuild', ['-version'])
+        value: await _failSafeSpawn(['xcodebuild', '-version'])
     }],
     android: async () => [{
         key: 'android',
-        value: await _failSafeSpawn('avdmanager', ['list', 'target'])
+        value: await _failSafeSpawn(['avdmanager', 'list', 'target'])
     }]
 };
 
-const _failSafeSpawn = (command, args) => execa(command, args).then(
-    ({ stdout }) => stdout,
-    err => `ERROR: ${err.message}`
-);
+async function _failSafeSpawn(args: Array<string>): Promise<string>{
+    return new Promise((resolve) => {
+        exec(args.join(" "),
+            (err, stdout) => {
+                if (err) {
+                    resolve(`ERROR: ${err.message}`);
+                }
+                resolve(stdout);
+            }
+        );
+    });
+}
 
-function _formatNodeList (list, level = 0) {
+interface NodeList {
+    children?: Array<NodeList>;
+    key: unknown;
+    value?: string;
+}
+function _formatNodeList (list: Array<NodeList>, level = 0): Array<string> {
     const content = [];
 
     for (const item of list) {
         const indent = String.prototype.padStart((4 * level), ' ');
         let itemString = `${indent}${item.key}:`;
 
-        if ('value' in item) {
+        if (item.value) {
             // Pad multi-line values with a new line on either end
             itemString += (/[\r\n]/.test(item.value))
                 ? `\n${item.value.trim()}\n`
@@ -207,18 +269,21 @@ function _formatNodeList (list, level = 0) {
     return content;
 }
 
-module.exports = async function () {
-    const projectRoot = cdvLibUtil.cdProjectRoot();
-
-    const results = await Promise.all([
+export const projectRoot = cdvLibUtil.cdProjectRoot();
+export const results = async ()=> {
+    const promises: Array<Promise<NodeList>> = [
         getCordovaDependenciesInfo(),
         getInstalledPlatforms(projectRoot),
         getInstalledPlugins(projectRoot),
         getEnvironmentInfo(),
         ...(await getPlatformEnvironmentData(projectRoot)),
         getProjectSettingsFiles(projectRoot)
-    ]);
+    ];
+    return Promise.all(promises);
+}
+export const content = async()=>_formatNodeList(await results());
 
-    const content = _formatNodeList(results);
-    cordova.emit('results', content.join('\n'));
-};
+async function main() {
+    cordova.emit('results', (await content()).join('\n'));
+}
+main();

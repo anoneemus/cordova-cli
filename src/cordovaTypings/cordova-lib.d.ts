@@ -17,7 +17,33 @@
     under the License.
 */
 
+declare module 'cordova-lib/src/cordova/util' {
+    const binname: string;
+    function listPlatforms (project_dir: string): Array<string>;
+    async function getInstalledPlatformsWithVersions(project_dir: string): Promise<Record<string, string>>;
+}
+
+declare module 'cordova-lib/src/cordova/plugin/util' {
+    class PluginInfo {
+        public id: string | undefined;
+        public version: string | undefined;
+        constructor (dirname: string);
+        private _getTags(tag: string, platform: string | Array<string>): unknown;
+    }
+    class PluginInfoProvider {
+        constructor();
+        public _cache: Record<string, PluginInfo>;
+        public _getAllCache: Record<string, Array<PluginInfo>>;
+        public getAllWithinSearchPath(dirName: string): Array<PluginInfo>;
+    }
+    function getInstalledPlugins(projectRoot: string): Array<PluginInfo>;
+}
+
 declare module 'cordova-lib' {
 	/** The name of the Cordova binary (as executed by the user, presumably) */
 	const binname: string;
+
+    declare module 'cordova_platforms' {
+        function getPlatformApi(platform, platformRootDir?: string): Record<string, object | string>
+    }
 }
