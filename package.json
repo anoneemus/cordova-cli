@@ -10,8 +10,9 @@
     "cordova": "./bin/cordova"
   },
   "scripts": {
-    "test": "npm run lint && npm run cover",
-    "lint": "eslint . bin/cordova",
+    "build": "tsc",
+    "test": "npm run build && npm run lint && npm run cover",
+    "lint": "eslint . bin/cordova --ext .ts",
     "cover": "nyc jasmine"
   },
   "repository": "github:apache/cordova-cli",
