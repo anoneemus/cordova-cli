@@ -17,6 +17,7 @@ devDependencies:
   '@cordova/eslint-config': 3.0.0
   '@types/insight': 0.8.0
   '@types/nopt': 3.0.29
+  '@types/update-notifier': 5.0.0
   jasmine: 3.6.4
   mock-stdin: 1.0.0
   nyc: 15.1.0
@@ -346,6 +347,10 @@ packages:
       node: '>= 6'
     resolution:
       integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
+  /@types/configstore/4.0.0:
+    dev: true
+    resolution:
+      integrity: sha512-SvCBBPzOIe/3Tu7jTl2Q8NjITjLmq9m7obzjSyb8PXWWZ31xVK6w4T6v8fOx+lrgQnqk3Yxc00LDolFsSakKCA==
   /@types/insight/0.8.0:
     dev: true
     resolution:
@@ -362,6 +367,13 @@ packages:
     dev: true
     resolution:
       integrity: sha1-8Z3z20yX7hRZonQAKDIKcdcJZM4=
+  /@types/update-notifier/5.0.0:
+    dependencies:
+      '@types/configstore': 4.0.0
+      boxen: 4.2.0
+    dev: true
+    resolution:
+      integrity: sha512-8CdLLv5ytMXEWfjSmWiuuZEffJJAsfNxSQbShZTmZD5picoci18VV1YqhKNTzlZvNCzt5WsnDQLyPSsj6xGuug==
   /abbrev/1.1.1:
     dev: false
     resolution:
@@ -427,7 +439,6 @@ packages:
   /ansi-align/3.0.0:
     dependencies:
       string-width: 3.1.0
-    dev: false
     resolution:
       integrity: sha512-ZpClVKqXN3RGBmKibdfWzqCY4lnjEuoNzU5T0oEFpfd/z5qJHVarukridD4juLO2FXMiwUQxr9WqQtaYa8XRYw==
   /ansi-escapes/3.2.0:
@@ -635,11 +646,10 @@ packages:
       camelcase: 5.3.1
       chalk: 3.0.0
       cli-boxes: 2.2.1
-      string-width: 4.2.1
+      string-width: 4.2.2
       term-size: 2.2.1
       type-fest: 0.8.1
       widest-line: 3.1.0
-    dev: false
     engines:
       node: '>=8'
     resolution:
@@ -782,7 +792,6 @@ packages:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
-    dev: false
     engines:
       node: '>=8'
     resolution:
@@ -815,7 +824,6 @@ packages:
     resolution:
       integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==
   /cli-boxes/2.2.1:
-    dev: false
     engines:
       node: '>=6'
     resolution:
@@ -4275,10 +4283,20 @@ packages:
       emoji-regex: 8.0.0
       is-fullwidth-code-point: 3.0.0
       strip-ansi: 6.0.0
+    dev: true
     engines:
       node: '>=8'
     resolution:
       integrity: sha512-LL0OLyN6AnfV9xqGQpDBwedT2Rt63737LxvsRxbcwpa2aIeynBApG2Sm//F3TaLHIR1aJBN52DWklc06b94o5Q==
+  /string-width/4.2.2:
+    dependencies:
+      emoji-regex: 8.0.0
+      is-fullwidth-code-point: 3.0.0
+      strip-ansi: 6.0.0
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-XBJbT3N4JhVumXE0eoLU9DCjcaF92KLNqTmFCnG1pf8duUxFGwtP6AD6nkjw9a3IdiRtL3E2w3JDiE/xi3vOeA==
   /string.prototype.trimend/1.0.4:
     dependencies:
       call-bind: 1.0.2
@@ -4422,7 +4440,6 @@ packages:
     resolution:
       integrity: sha512-DUCttfhsnLCjwoDoFcI+B2iJgYa93vBnDUATYEeRx6sntCTdN01VnqsIuTlALXla/LWooNg0yEGeB+Y8WdFxGA==
   /term-size/2.2.1:
-    dev: false
     engines:
       node: '>=8'
     resolution:
@@ -4715,8 +4732,7 @@ packages:
       integrity: sha512-QGkOQc8XL6Bt5PwnsExKBPuMKBxnGxWWW3fU55Xt4feHozMUhdUMaBCk290qpm/wG5u/RSKzwdAC4i51YigihA==
   /widest-line/3.1.0:
     dependencies:
-      string-width: 4.2.1
-    dev: false
+      string-width: 4.2.2
     engines:
       node: '>=8'
     resolution:
@@ -4840,6 +4856,7 @@ specifiers:
   '@types/insight': ^0.8.0
   '@types/node': ^14.14.31
   '@types/nopt': ^3.0.29
+  '@types/update-notifier': ^5.0.0
   configstore: ^5.0.1
   cordova-common: ^4.0.2
   cordova-create: ^3.0.0
