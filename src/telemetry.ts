@@ -72,9 +72,9 @@ export async function showPrompt (): Promise<boolean> {
     });
 }
 
-export function track (...args: Array<string>): void {
+export function track (...args: Array<string | null | undefined>): void {
     // Remove empty, null or undefined strings from arguments
-    const filteredArgs = args.filter(val => val && val.length !== 0);
+    const filteredArgs = args.filter(val => val && val.length !== 0) as Array<string>;
     insight.track(...filteredArgs);
 }
 

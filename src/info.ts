@@ -283,7 +283,9 @@ export const results = async ()=> {
 }
 export const content = async()=>_formatNodeList(await results());
 
-async function main() {
-    cordova.emit('results', (await content()).join('\n'));
+export async function info(): Promise<Array<string>> {
+    const cont = await content();
+    cordova.emit('results', cont.join('\n'));
+    return cont;
 }
-main();
+info();

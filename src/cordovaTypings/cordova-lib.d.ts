@@ -43,7 +43,13 @@ declare module 'cordova-lib' {
 	/** The name of the Cordova binary (as executed by the user, presumably) */
 	const binname: string;
 
-    declare module 'cordova_platforms' {
-        function getPlatformApi(platform, platformRootDir?: string): Record<string, object | string>
+    const cordova_platforms: {
+        getPlatformApi(platform, platformRootDir?: string): {getEnvironmentInfo?: ()=>(()=>Promise<Array<{key: string, value: string}>>)}
     }
+
+    const cordova;
+    const events;
+    class CordovaError{
+        constructor(msg: string);
+    };
 }
