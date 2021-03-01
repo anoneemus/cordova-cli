@@ -39,6 +39,8 @@ declare module 'cordova-lib/src/cordova/plugin/util' {
     function getInstalledPlugins(projectRoot: string): Array<PluginInfo>;
 }
 
+declare module 'cordova-lib/src/cordova/cordova';
+
 declare module 'cordova-lib' {
 	/** The name of the Cordova binary (as executed by the user, presumably) */
 	const binname: string;

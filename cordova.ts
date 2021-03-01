@@ -19,13 +19,14 @@
 
 // All cordova js API moved to cordova-lib. If you don't need the cordova CLI,
 // use cordova-lib directly.
+import c_lib from 'cordova-lib';
 
-var cordova_lib = require('cordova-lib');
-module.exports = cordova_lib.cordova;
+import CLI from './src/cli';
 
+export * from "cordova-lib/src/cordova/cordova";
 // Also export the cordova-lib so that downstream consumers of cordova lib and
 // CLI will be able to use CLI's cordova-lib and avoid the risk of having two
 // different versions of cordova-lib which would result in two instances of
 // "events" and can cause bad event handling.
-module.exports.cordova_lib = cordova_lib;
-module.exports.cli = require('./src/cli');
+export const cordova_lib = c_lib;
+export const cli = CLI;
