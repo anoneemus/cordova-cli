@@ -16,6 +16,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"typeRoots": [
 			"src/cordovaTypings",
+			"src/otherTypings",
 			"node_modules/@types"
 		],
 		"resolveJsonModule": true
