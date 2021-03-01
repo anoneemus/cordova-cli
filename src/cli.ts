@@ -18,7 +18,7 @@
 import Configstore from 'configstore';
 import editor from 'editor';
 import nopt from 'nopt';
-import { prerelease, satisfies } from "semver";
+import { prerelease, satisfies } from 'semver';
 import updateNotifier from 'update-notifier';
 
 import { CordovaLogger } from 'cordova-common';
@@ -231,7 +231,7 @@ export default function (inputArgs: Array<string> = process.argv) {
         }
         throw err;
     });
-};
+}
 
 const commandsWithSubCommands = new Set([
     'config',
@@ -239,8 +239,8 @@ const commandsWithSubCommands = new Set([
     'platforms',
     'plugin',
     'plugins',
-    'telemetry',
-])
+    'telemetry'
+]);
 function getSubCommand (args: Array<string>, cmd: string | undefined): string | null {
     if (!cmd) {
         return null;
@@ -372,7 +372,7 @@ function cli (inputArgs: Array<string>) {
     // In this case "--verbose" is not parsed by nopt and args.vergbose will be
     // false, the unparsed args after -- are kept in unparsedArgs and can be
     // passed downstream to some scripts invoked by Cordova.
-    let unparsedArgs = new Array<string>();
+    let unparsedArgs: Array<string> = [];
     const parseStopperIdx = args.argv.original.indexOf('--');
     if (parseStopperIdx !== -1) {
         unparsedArgs = args.argv.original.slice(parseStopperIdx + 1);
@@ -410,7 +410,7 @@ function cli (inputArgs: Array<string>) {
     }
 
     const opts = {
-        platforms: new Array<string>(),
+        platforms: [] as Array<string>,
         options: {
 
         } as OptionsType,
@@ -437,7 +437,7 @@ function cli (inputArgs: Array<string>) {
         opts.platforms = undashed.slice(1);
 
         return cordova[cmd].call(null, opts.platforms)
-            .then( (platformChecks: Record<string, Array<CheckItem> | CordovaError>) => {
+            .then((platformChecks: Record<string, Array<CheckItem> | CordovaError>) => {
                 const someChecksFailed = Object.keys(platformChecks).map(function (platformName) {
                     events.emit('log', '\nRequirements check results for ' + platformName + ':');
                     const platformCheck = platformChecks[platformName];

@@ -20,7 +20,7 @@
 declare module 'cordova-lib/src/cordova/util' {
     const binname: string;
     function listPlatforms (project_dir: string): Array<string>;
-    async function getInstalledPlatformsWithVersions(project_dir: string): Promise<Record<string, string>>;
+    function getInstalledPlatformsWithVersions(project_dir: string): Promise<Record<string, string>>;
 }
 
 declare module 'cordova-lib/src/cordova/plugin/util' {
@@ -31,7 +31,7 @@ declare module 'cordova-lib/src/cordova/plugin/util' {
         private _getTags(tag: string, platform: string | Array<string>): unknown;
     }
     class PluginInfoProvider {
-        constructor();
+        constructor ();
         public _cache: Record<string, PluginInfo>;
         public _getAllCache: Record<string, Array<PluginInfo>>;
         public getAllWithinSearchPath(dirName: string): Array<PluginInfo>;
@@ -42,16 +42,16 @@ declare module 'cordova-lib/src/cordova/plugin/util' {
 declare module 'cordova-lib/src/cordova/cordova';
 
 declare module 'cordova-lib' {
-	/** The name of the Cordova binary (as executed by the user, presumably) */
-	const binname: string;
+    /** The name of the Cordova binary (as executed by the user, presumably) */
+    const binname: string;
 
     const cordova_platforms: {
         getPlatformApi(platform, platformRootDir?: string): {getEnvironmentInfo?: ()=>(()=>Promise<Array<{key: string, value: string}>>)}
-    }
+    };
 
     const cordova;
     const events;
-    class CordovaError{
-        constructor(msg: string);
-    };
+    class CordovaError {
+        constructor (msg: string);
+    }
 }

@@ -19,11 +19,11 @@
 // https://github.com/cordova/cordova-discuss/pull/43
 
 // Google Analytics tracking code
-const GA_TRACKING_CODE = 'UA-64283057-7';
-
-import { EOL } from "os";
+import { EOL } from 'os';
 import Insight from 'insight';
 import pkg from '../package.json';
+
+const GA_TRACKING_CODE = 'UA-64283057-7';
 
 /**
  * By redefining `get optOut` we trick Insight into tracking
@@ -47,7 +47,7 @@ const insight = new RelentlessInsight({
     pkg: pkg
 });
 
-export let timeoutInSecs = 30;
+export const timeoutInSecs = 30;
 
 /**
  * Prompts the user to allow telemetry, and returns their response.
@@ -115,8 +115,8 @@ export function hasUserOptedInOrOut (): boolean {
 /**
  * Is the environment variable 'CI' specified ?
  */
-export function isCI (env: Record<string, unknown>): env is Record<string, unknown> & Record<"CI", unknown> {
-    return "CI" in env;
+export function isCI (env: Record<string, unknown>): env is Record<string, unknown> & Record<'CI', unknown> {
+    return 'CI' in env;
 }
 
 /**

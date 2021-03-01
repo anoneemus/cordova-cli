@@ -36,15 +36,12 @@ const systeminformation_1 = require("systeminformation");
 const cordova_lib_1 = require("cordova-lib");
 const util_1 = require("cordova-lib/src/cordova/util");
 const util_2 = require("cordova-lib/src/cordova/plugin/util");
-const getPlatformApi = cordova_lib_1.cordova_platforms.getPlatformApi;
 const package_json_1 = __importDefault(require("../package.json"));
 const package_json_2 = __importDefault(require("cordova-lib/package.json"));
+const getPlatformApi = cordova_lib_1.cordova_platforms.getPlatformApi;
 const cdvLibUtil = require('cordova-lib/src/cordova/util');
 // Cache
 let _installedPlatformsList = null;
-/*
- * Sections
- */
 function getCordovaDependenciesInfo() {
     return __awaiter(this, void 0, void 0, function* () {
         // get self "Cordova CLI"
@@ -115,10 +112,10 @@ function getPlatformEnvironmentData(projectRoot) {
             if (platformApi && platformApi.getEnvironmentInfo) {
                 getPlatformInfo = platformApi.getEnvironmentInfo();
             }
-            else if (platform === "ios") {
+            else if (platform === 'ios') {
                 getPlatformInfo = _legacyPlatformInfo.ios;
             }
-            else if (platform === "android") {
+            else if (platform === 'android') {
                 getPlatformInfo = _legacyPlatformInfo.android;
             }
             else {
@@ -154,6 +151,9 @@ function getProjectSettingsFiles(projectRoot) {
         };
     });
 }
+/*
+ * Section Data Helpers
+ */
 function _getLibDependenciesInfo(dependencies) {
     return __awaiter(this, void 0, void 0, function* () {
         const cordovaPrefix = 'cordova-';
@@ -177,7 +177,7 @@ function _getNpmVersion() {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             child_process_1.exec('npm -v', (err, stdout, stderr) => {
-                if (stderr !== "") {
+                if (stderr !== '') {
                     console.error("'npm -v' stderr:", stderr);
                 }
                 if (err) {
@@ -215,7 +215,7 @@ const _legacyPlatformInfo = {
 function _failSafeSpawn(args) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve) => {
-            child_process_1.exec(args.join(" "), (err, stdout) => {
+            child_process_1.exec(args.join(' '), (err, stdout) => {
                 if (err) {
                     resolve(`ERROR: ${err.message}`);
                 }

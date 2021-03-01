@@ -42,7 +42,6 @@ function help(arg = 'cordova') {
     if (!file[0]) {
         throw new Error(`no help files found for '${arg}'`);
     }
-    return fs_1.readFileSync(file[0], "utf8").replace(/cordova-cli/g, cordova_lib_1.binname);
+    return fs_1.readFileSync(file[0], 'utf8').replace(/cordova-cli/g, cordova_lib_1.binname);
 }
 exports.help = help;
-;

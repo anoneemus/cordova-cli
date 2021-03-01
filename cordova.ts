@@ -23,7 +23,7 @@ import c_lib from 'cordova-lib';
 
 import CLI from './src/cli';
 
-export * from "cordova-lib/src/cordova/cordova";
+export * from 'cordova-lib/src/cordova/cordova';
 // Also export the cordova-lib so that downstream consumers of cordova lib and
 // CLI will be able to use CLI's cordova-lib and avoid the risk of having two
 // different versions of cordova-lib which would result in two instances of

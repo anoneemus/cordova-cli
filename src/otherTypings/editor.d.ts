@@ -18,6 +18,6 @@
 */
 
 declare module 'editor' {
-	const editor: (path: string, callback: (code: unknown, sig?: unknown) => void) => void;
-	export = editor;
-};
+    const editor: (path: string, callback: (code: unknown, sig?: unknown) => void) => void;
+    export = editor;
+}

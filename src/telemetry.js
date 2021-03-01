@@ -32,10 +32,10 @@ exports.isNoTelemetryFlag = exports.isCI = exports.hasUserOptedInOrOut = exports
 // For further details on telemetry, see:
 // https://github.com/cordova/cordova-discuss/pull/43
 // Google Analytics tracking code
-const GA_TRACKING_CODE = 'UA-64283057-7';
 const os_1 = require("os");
 const insight_1 = __importDefault(require("insight"));
 const package_json_1 = __importDefault(require("../package.json"));
+const GA_TRACKING_CODE = 'UA-64283057-7';
 /**
  * By redefining `get optOut` we trick Insight into tracking
  * even though the user might have opted out.
@@ -129,7 +129,7 @@ exports.hasUserOptedInOrOut = hasUserOptedInOrOut;
  * Is the environment variable 'CI' specified ?
  */
 function isCI(env) {
-    return "CI" in env;
+    return 'CI' in env;
 }
 exports.isCI = isCI;
 /**

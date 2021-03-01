@@ -21,13 +21,13 @@ import type { PathLike } from 'fs';
 import { join } from 'path';
 import { osInfo } from 'systeminformation';
 import { cordova, cordova_platforms } from 'cordova-lib';
-import { getInstalledPlatformsWithVersions } from "cordova-lib/src/cordova/util";
-import { getInstalledPlugins as cdvGetInstalledPlugins } from "cordova-lib/src/cordova/plugin/util";
+import { getInstalledPlatformsWithVersions } from 'cordova-lib/src/cordova/util';
+import { getInstalledPlugins as cdvGetInstalledPlugins } from 'cordova-lib/src/cordova/plugin/util';
+
+import cliPkg from '../package.json';
+import libPkg from 'cordova-lib/package.json';
 
 const getPlatformApi = cordova_platforms.getPlatformApi;
-
-import cliPkg from "../package.json";
-import libPkg from "cordova-lib/package.json";
 
 const cdvLibUtil = require('cordova-lib/src/cordova/util');
 
@@ -37,6 +37,12 @@ let _installedPlatformsList: Record<string, string> | null = null;
 /*
  * Sections
  */
+
+interface DependencyInfo {
+    children?: Array<DependencyInfo>;
+    key: string | undefined;
+    value?: string;
+}
 
 async function getCordovaDependenciesInfo (): Promise<DependencyInfo> {
     // get self "Cordova CLI"
@@ -115,6 +121,11 @@ async function getEnvironmentInfo (): Promise<EnvironmentInfo> {
     };
 }
 
+interface NodeList {
+    children?: Array<NodeList>;
+    key: unknown;
+    value?: string;
+}
 async function getPlatformEnvironmentData (projectRoot: string): Promise<Array<Promise<NodeList>>> {
     const installedPlatforms = await _getInstalledPlatforms(projectRoot);
 
@@ -125,9 +136,9 @@ async function getPlatformEnvironmentData (projectRoot: string): Promise<Array<P
             let getPlatformInfo;
             if (platformApi && platformApi.getEnvironmentInfo) {
                 getPlatformInfo = platformApi.getEnvironmentInfo();
-            } else if (platform === "ios") {
+            } else if (platform === 'ios') {
                 getPlatformInfo = _legacyPlatformInfo.ios;
-            } else if (platform === "android") {
+            } else if (platform === 'android') {
                 getPlatformInfo = _legacyPlatformInfo.android;
             } else {
                 getPlatformInfo = false;
@@ -165,12 +176,6 @@ async function getProjectSettingsFiles (projectRoot: string) {
 /*
  * Section Data Helpers
  */
-
-interface DependencyInfo {
-    children?: Array<DependencyInfo>;
-    key: string | undefined;
-    value?: string;
-}
 async function _getLibDependenciesInfo (dependencies: Record<string, string>): Promise<Array<DependencyInfo>> {
     const cordovaPrefix = 'cordova-';
 
@@ -192,7 +197,7 @@ async function _getInstalledPlatforms (projectRoot: string): Promise<Record<stri
 async function _getNpmVersion (): Promise<string> {
     return new Promise((resolve, reject) => {
         exec('npm -v', (err, stdout, stderr) => {
-            if (stderr !== "") {
+            if (stderr !== '') {
                 console.error("'npm -v' stderr:", stderr);
             }
             if (err) {
@@ -224,9 +229,9 @@ const _legacyPlatformInfo = {
     }]
 };
 
-async function _failSafeSpawn(args: Array<string>): Promise<string>{
+async function _failSafeSpawn (args: Array<string>): Promise<string> {
     return new Promise((resolve) => {
-        exec(args.join(" "),
+        exec(args.join(' '),
             (err, stdout) => {
                 if (err) {
                     resolve(`ERROR: ${err.message}`);
@@ -237,11 +242,6 @@ async function _failSafeSpawn(args: Array<string>): Promise<string>{
     });
 }
 
-interface NodeList {
-    children?: Array<NodeList>;
-    key: unknown;
-    value?: string;
-}
 function _formatNodeList (list: Array<NodeList>, level = 0): Array<string> {
     const content = [];
 
@@ -270,7 +270,7 @@ function _formatNodeList (list: Array<NodeList>, level = 0): Array<string> {
 }
 
 export const projectRoot = cdvLibUtil.cdProjectRoot();
-export const results = async ()=> {
+export const results = async () => {
     const promises: Array<Promise<NodeList>> = [
         getCordovaDependenciesInfo(),
         getInstalledPlatforms(projectRoot),
@@ -280,10 +280,10 @@ export const results = async ()=> {
         getProjectSettingsFiles(projectRoot)
     ];
     return Promise.all(promises);
-}
-export const content = async()=>_formatNodeList(await results());
+};
+export const content = async () => _formatNodeList(await results());
 
-export async function info(): Promise<Array<string>> {
+export async function info (): Promise<Array<string>> {
     const cont = await content();
     cordova.emit('results', cont.join('\n'));
     return cont;

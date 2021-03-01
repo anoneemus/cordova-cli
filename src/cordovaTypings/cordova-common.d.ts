@@ -17,7 +17,7 @@
     under the License.
 */
 declare module 'cordova-common' {
-	const CordovaLogger: {
-		get;
-	};
+    const CordovaLogger: {
+        get;
+    };
 }

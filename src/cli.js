@@ -200,14 +200,13 @@ function default_1(inputArgs = process.argv) {
     });
 }
 exports.default = default_1;
-;
 const commandsWithSubCommands = new Set([
     'config',
     'platform',
     'platforms',
     'plugin',
     'plugins',
-    'telemetry',
+    'telemetry'
 ]);
 function getSubCommand(args, cmd) {
     var _a;
@@ -315,7 +314,7 @@ function cli(inputArgs) {
     // In this case "--verbose" is not parsed by nopt and args.vergbose will be
     // false, the unparsed args after -- are kept in unparsedArgs and can be
     // passed downstream to some scripts invoked by Cordova.
-    let unparsedArgs = new Array();
+    let unparsedArgs = [];
     const parseStopperIdx = args.argv.original.indexOf('--');
     if (parseStopperIdx !== -1) {
         unparsedArgs = args.argv.original.slice(parseStopperIdx + 1);
@@ -348,7 +347,7 @@ function cli(inputArgs) {
         throw new cordova_lib_1.CordovaError(msg2);
     }
     const opts = {
-        platforms: new Array(),
+        platforms: [],
         options: {},
         verbose: ((_a = args['verbose']) !== null && _a !== void 0 ? _a : false),
         silent: ((_b = args['silent']) !== null && _b !== void 0 ? _b : false),
